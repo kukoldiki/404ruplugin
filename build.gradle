@@ -1,0 +1,58 @@
+plugins {
+    id("java")
+    id "org.jetbrains.kotlin.jvm" version "2.2.21"
+}
+
+version '1.0'
+
+sourceSets.main.java.srcDirs = ["src"]
+
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
+repositories {
+    mavenCentral()
+    maven { url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
+    maven { url 'https://www.jitpack.io' }
+}
+
+ext {
+    //the build number that this plugin is made for
+    mindustryVersion = 'v146'
+    jabelVersion = "93fde537c7"
+}
+
+dependencies {
+    // implementation(files("postgresql-42.7.5.jar"))
+    compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+    compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    // implementation 'com.discord4j:discord4j-core:3.3.0'
+    implementation("net.dv8tion:JDA:6.3.0") {
+        exclude module: 'opus-java' // opus-java for audio support
+    }
+    implementation 'org.postgresql:postgresql:42.7.7'
+    compileOnly 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+}
+
+jar {
+    archiveFileName = "${project.archivesBaseName}.jar"
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    from(rootDir) {
+        include "plugin.json"
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+javadoc {
+    source = sourceSets.main.allJava
+    classpath = configurations.compileClasspath
+    destinationDir = file("$buildDir/javadoc")
+}
+compileKotlin {
+}
